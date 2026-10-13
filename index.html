@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Quiz du tableau périodique : retrouve le symbole et le nom français des 118 éléments chimiques.">
+<meta name="theme-color" content="#1f5fae">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236b3fc2'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='700' font-size='15' text-anchor='middle' fill='%23fff'%3EFe%3C/text%3E%3C/svg%3E">
+<style>
+/* Base commune (remplace le squelette fourni par l'hébergeur d'origine) */
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
+body{margin:0;font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+[hidden]{display:none!important}
+</style>
+<title>Tableau périodique des éléments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout : en-tête + tableau 18 colonnes ; le score et la légende occupent le creux du bloc d (colonnes 3 à 12, périodes 1 à 3) ;
+   la case cliquée s'agrandit en carte de saisie au centre de l'écran */
+:root{
+  --bg:#eef1f4; --fg:#18222d; --muted:#5b6977; --panel:#ffffff; --line:#d5dde5;
+  --accent:#1f5fae; --accent-ink:#ffffff; --sel:#f2b544; --ok:#2c8a5a; --bad:#c2412d;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  /* familles : fond / encre */
+  --alk-bg:#d3f1ef; --alk:#0b6f68;
+  --ale-bg:#fde0de; --ale:#b42318;
+  --tra-bg:#ebe3fb; --tra:#6b3fc2;
+  --pot-bg:#dcf2d4; --pot:#2f7a1f;
+  --mtd-bg:#fdecd2; --mtd:#9a5300;
+  --non-bg:#dfe7fc; --non:#2a4fb8;
+  --hal-bg:#f7efc2; --hal:#7a6200;
+  --nob-bg:#fbe0ef; --nob:#a3216b;
+  --lan-bg:#d6edfa; --lan:#0b5f8f;
+  --act-bg:#ffe2d3; --act:#b13d0e;
+  --unk-bg:#e8e9ee; --unk:#5b6170;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10161d; --fg:#e6edf3; --muted:#9aabbb; --panel:#1a232d; --line:#2e3c4a;
+  --accent:#6ea8ef; --accent-ink:#0c1520; --ok:#5cc28f; --bad:#ff7a63; color-scheme:dark;
+  --alk-bg:#123b39; --alk:#7ddbd2; --ale-bg:#4a1d1b; --ale:#ff9f97; --tra-bg:#2d2446; --tra:#c6adff;
+  --pot-bg:#1c3a17; --pot:#9edc8a; --mtd-bg:#45301a; --mtd:#f5bd7a; --non-bg:#1c2b4b; --non:#9cb8ff;
+  --hal-bg:#3b3514; --hal:#ecd36a; --nob-bg:#45192f; --nob:#ff95c9; --lan-bg:#13344b; --lan:#86c9f2;
+  --act-bg:#4a2416; --act:#ffaa80; --unk-bg:#272c35; --unk:#a7afbd}}
+:root[data-theme="dark"]{
+  --bg:#10161d; --fg:#e6edf3; --muted:#9aabbb; --panel:#1a232d; --line:#2e3c4a;
+  --accent:#6ea8ef; --accent-ink:#0c1520; --ok:#5cc28f; --bad:#ff7a63; color-scheme:dark;
+  --alk-bg:#123b39; --alk:#7ddbd2; --ale-bg:#4a1d1b; --ale:#ff9f97; --tra-bg:#2d2446; --tra:#c6adff;
+  --pot-bg:#1c3a17; --pot:#9edc8a; --mtd-bg:#45301a; --mtd:#f5bd7a; --non-bg:#1c2b4b; --non:#9cb8ff;
+  --hal-bg:#3b3514; --hal:#ecd36a; --nob-bg:#45192f; --nob:#ff95c9; --lan-bg:#13344b; --lan:#86c9f2;
+  --act-bg:#4a2416; --act:#ffaa80; --unk-bg:#272c35; --unk:#a7afbd}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px}
+.app{display:flex;flex-direction:column;gap:12px;padding:12px 16px;box-sizing:border-box;max-width:1500px;margin:0 auto}
+header{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:700;font-size:1.6rem;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:.9rem;flex-basis:100%;margin:0}
+.tools{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.btn{padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font:600 .86rem var(--f-body);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.86rem;background:var(--panel);border:1px solid var(--bad);border-radius:10px;padding:8px 10px}
+
+/* ---- tableau ---- */
+.tablewrap{overflow-x:auto;overscroll-behavior-x:contain;padding-bottom:4px}
+.ptable{--gap:4px;display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:var(--gap);
+  width:100%;min-width:830px;max-width:calc((100vh - 150px) * 1.72);margin:0 auto}
+.gapf{grid-column:1/-1;height:10px}
+.cell{position:relative;aspect-ratio:1/1.08;border-radius:7px;border:1px solid color-mix(in srgb,var(--c) 22%,transparent);
+  background:color-mix(in srgb,var(--cb) 55%,var(--panel));color:var(--c);cursor:pointer;padding:0;font:inherit;text-align:left;
+  container-type:inline-size;transition:transform .15s,box-shadow .15s,opacity .2s,background .3s}
+.cell:hover{transform:translateY(-1px);box-shadow:0 3px 10px color-mix(in srgb,var(--c) 25%,transparent);border-color:color-mix(in srgb,var(--c) 55%,transparent)}
+.cell:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cell .z{position:absolute;left:8cqw;top:5cqw;font:600 15cqw/1 var(--f-mono);opacity:.85}
+.cell:not(.found) .z{left:0;right:0;top:0;bottom:0;display:grid;place-items:center;font-size:26cqw;opacity:.6}
+.cell .s{position:absolute;inset:18cqw 0 22cqw;display:grid;place-items:center;font:500 40cqw/1 var(--f-body)}
+.cell .n{position:absolute;left:3cqw;right:3cqw;bottom:6cqw;text-align:center;font:600 11.5cqw/1.1 var(--f-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell.found{background:var(--cb);border-color:color-mix(in srgb,var(--c) 30%,transparent)}
+.cell.found.pop{animation:pop .5s}
+@keyframes pop{40%{transform:scale(1.12)}}
+.cell.dim{opacity:.22}
+.cell.open{visibility:hidden}
+
+/* ---- creux du bloc d : score + légende ---- */
+.inset{grid-column:3/13;grid-row:1/4;align-self:stretch;container-type:inline-size;display:flex;flex-direction:column;gap:1.4cqw;padding:0 3cqw 0 4cqw;min-width:0}
+.score{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.4cqw 3cqw;align-items:center}
+.big{font-family:var(--f-display);font-weight:700;font-size:6.2cqw;line-height:1;font-variant-numeric:tabular-nums}
+.big small{font-size:2.6cqw;color:var(--muted);font-weight:500}
+.bar{height:1.3cqw;min-height:6px;border-radius:9px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+.meta{grid-column:1/-1;display:flex;justify-content:space-between;color:var(--muted);font-size:2.1cqw;font-variant-numeric:tabular-nums}
+.legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6cqw 2.5cqw;margin:0;padding:0;list-style:none}
+.legend li{display:grid;grid-template-columns:2cqw minmax(0,1fr) auto;gap:1.2cqw;align-items:center;font-size:2.15cqw;cursor:default;border-radius:4px}
+.legend .sw{width:2cqw;height:2cqw;border-radius:.5cqw;background:var(--cb);border:1px solid var(--c)}
+.legend span:nth-child(2){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend .k{font-family:var(--f-mono);color:var(--muted);font-size:1.9cqw}
+.legend li.done span:nth-child(2){font-weight:600}
+
+/* ---- carte agrandie ---- */
+.backdrop{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:10}
+.zcard{position:fixed;left:50%;top:50%;width:min(360px,calc(100vw - 32px));translate:-50% -50%;z-index:11;box-sizing:border-box;
+  background:var(--cb);color:var(--c);border:1.5px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:18px;
+  box-shadow:0 24px 60px rgba(10,20,30,.28);padding:18px;display:flex;flex-direction:column;gap:12px;transform-origin:0 0}
+.zcard .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-right:26px}
+.zcard .zz{font:600 2.2rem/1 var(--f-mono)}
+.zcard .cat{font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;font-weight:600;text-align:right}
+.zcard .close{position:absolute;top:6px;right:8px;border:0;background:none;color:var(--c);font-size:22px;cursor:pointer;padding:4px;line-height:1;opacity:.7}
+.zcard .reveal{display:grid;place-items:center;gap:4px;padding:6px 0}
+.zcard .reveal b{font:500 4.6rem/1 var(--f-body)}
+.zcard .reveal span{font:600 1.2rem var(--f-body)}
+.fields{display:grid;grid-template-columns:88px minmax(0,1fr);gap:8px}
+.fields label{display:block;font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px;color:var(--c);font-weight:600}
+.namewrap{display:grid;grid-template-columns:minmax(0,1fr) 40px;gap:6px}
+.zcard input{width:100%;box-sizing:border-box;padding:10px;border-radius:9px;border:1px solid color-mix(in srgb,var(--c) 30%,transparent);
+  background:var(--panel);color:var(--fg);font:500 1rem var(--f-body)}
+.zcard input#sym{font:600 1.3rem var(--f-body);text-align:center;padding:7px 6px}
+.zcard input:focus{outline:2px solid var(--c);outline-offset:0;border-color:transparent}
+.zcard input.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--panel))}
+.zcard input.good{border-color:var(--ok)}
+.hbtn{display:grid;place-items:center;border-radius:9px;border:1px solid color-mix(in srgb,var(--c) 30%,transparent);background:var(--panel);color:var(--muted);cursor:pointer;padding:0}
+.hbtn:hover,.hbtn.used{color:var(--sel)}
+.hbtn svg{width:19px;height:19px}
+.hbtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.msg{font-size:.88rem;min-height:1.2em;margin:0;color:var(--fg)}
+.msg.bad{color:var(--bad)} .msg.ok{color:var(--ok);font-weight:600}
+.zcard .actions{display:flex;gap:8px}
+.zcard .actions .btn{flex:1}
+.zcard .zin{display:flex;flex-direction:column;gap:12px}
+.shake{animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.credits{font-size:.75rem;color:var(--muted);line-height:1.4}
+.credits a{color:inherit}
+@media (prefers-reduced-motion:reduce){.shake,.cell.found.pop{animation:none}.cell{transition:none}}
+@media (max-width:820px){
+  h1{font-size:1.3rem}
+  .tools{margin-left:0}
+  .ptable{--gap:3px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Tableau périodique des éléments</h1>
+    <div class="tools">
+      <button class="btn" id="randomBtn" type="button">Élément au hasard</button>
+      <button class="btn" id="resetBtn" type="button">Recommencer</button>
+    </div>
+    <p class="sub">Clique une case et donne le symbole et le nom de l'élément. L'ampoule révèle le nom lettre par lettre.</p>
+  </header>
+  <div class="confirm" id="confirm" hidden>
+    <span>Effacer toute ta progression sur le tableau ?</span>
+    <button class="btn" id="cNo" type="button">Annuler</button><button class="btn primary" id="cYes" type="button">Effacer</button>
+  </div>
+
+  <div class="tablewrap">
+    <div class="ptable" id="ptable" role="grid" aria-label="Tableau périodique">
+      <div class="inset">
+        <div class="score">
+          <div class="big"><span id="cnt">0</span> <small>/ 118</small></div>
+          <div class="bar"><i id="bar"></i></div>
+          <div class="meta"><span id="hintCount">Aucune lettre révélée</span><span id="pct">0 %</span></div>
+        </div>
+        <ul class="legend" id="legend"></ul>
+      </div>
+    </div>
+  </div>
+
+  <footer class="credits">
+    Noms français des éléments selon l'usage IUPAC francophone. Les couleurs suivent la classification usuelle par familles.<br>
+    Vibecodé avec 🤖 par <a href="https://github.com/piRstone" target="_blank" rel="noopener">piRstone</a> entre deux prompts ·
+    <a href="https://github.com/piRstone/chimie-quiz" target="_blank" rel="noopener">GitHub</a>
+  </footer>
+</div>
+
+<div class="backdrop" id="backdrop" hidden></div>
+<form class="zcard" id="zcard" hidden autocomplete="off" role="dialog" aria-modal="true" aria-labelledby="zz">
+  <button type="button" class="close" id="zclose" aria-label="Fermer">×</button>
+  <div class="top"><span class="zz" id="zz">1</span><span class="cat" id="zcat"></span></div>
+  <div class="zin" id="ask">
+    <div class="fields">
+      <div><label for="sym">Symbole</label><input id="sym" maxlength="3" spellcheck="false" autocapitalize="off"></div>
+      <div><label for="nm">Nom</label>
+        <div class="namewrap"><input id="nm" spellcheck="false" placeholder="Nom de l'élément">
+          <button type="button" class="hbtn" id="hint" title="Indice : une lettre de plus" aria-label="Indice : une lettre du nom"></button></div></div>
+    </div>
+    <p class="msg" id="msg" aria-live="polite"></p>
+    <div class="actions"><button type="button" class="btn" id="later">Plus tard</button><button type="submit" class="btn primary">Valider</button></div>
+  </div>
+  <div class="zin" id="done" hidden>
+    <div class="reveal"><b id="dsym"></b><span id="dname"></span></div>
+    <p class="msg ok" id="dmsg"></p>
+    <div class="actions"><button type="button" class="btn" id="dclose">Fermer</button><button type="button" class="btn primary" id="next">Élément suivant →</button></div>
+  </div>
+</form>
+
+<script>
+// numéro | symbole | nom | famille | autres noms acceptés
+const RAW=`1|H|Hydrogène|non
+2|He|Hélium|nob
+3|Li|Lithium|alk
+4|Be|Béryllium|ale
+5|B|Bore|mtd
+6|C|Carbone|non
+7|N|Azote|non
+8|O|Oxygène|non
+9|F|Fluor|hal
+10|Ne|Néon|nob
+11|Na|Sodium|alk
+12|Mg|Magnésium|ale
+13|Al|Aluminium|pot
+14|Si|Silicium|mtd
+15|P|Phosphore|non
+16|S|Soufre|non
+17|Cl|Chlore|hal
+18|Ar|Argon|nob
+19|K|Potassium|alk
+20|Ca|Calcium|ale
+21|Sc|Scandium|tra
+22|Ti|Titane|tra
+23|V|Vanadium|tra
+24|Cr|Chrome|tra
+25|Mn|Manganèse|tra
+26|Fe|Fer|tra
+27|Co|Cobalt|tra
+28|Ni|Nickel|tra
+29|Cu|Cuivre|tra
+30|Zn|Zinc|tra
+31|Ga|Gallium|pot
+32|Ge|Germanium|mtd
+33|As|Arsenic|mtd
+34|Se|Sélénium|non
+35|Br|Brome|hal
+36|Kr|Krypton|nob
+37|Rb|Rubidium|alk
+38|Sr|Strontium|ale
+39|Y|Yttrium|tra
+40|Zr|Zirconium|tra
+41|Nb|Niobium|tra
+42|Mo|Molybdène|tra
+43|Tc|Technétium|tra
+44|Ru|Ruthénium|tra
+45|Rh|Rhodium|tra
+46|Pd|Palladium|tra
+47|Ag|Argent|tra
+48|Cd|Cadmium|tra
+49|In|Indium|pot
+50|Sn|Étain|pot
+51|Sb|Antimoine|mtd
+52|Te|Tellure|mtd
+53|I|Iode|hal
+54|Xe|Xénon|nob
+55|Cs|Césium|alk
+56|Ba|Baryum|ale
+57|La|Lanthane|lan
+58|Ce|Cérium|lan
+59|Pr|Praséodyme|lan
+60|Nd|Néodyme|lan
+61|Pm|Prométhium|lan
+62|Sm|Samarium|lan
+63|Eu|Europium|lan
+64|Gd|Gadolinium|lan
+65|Tb|Terbium|lan
+66|Dy|Dysprosium|lan
+67|Ho|Holmium|lan
+68|Er|Erbium|lan
+69|Tm|Thulium|lan
+70|Yb|Ytterbium|lan
+71|Lu|Lutécium|lan|Lutétium
+72|Hf|Hafnium|tra
+73|Ta|Tantale|tra
+74|W|Tungstène|tra|Wolfram
+75|Re|Rhénium|tra
+76|Os|Osmium|tra
+77|Ir|Iridium|tra
+78|Pt|Platine|tra
+79|Au|Or|tra
+80|Hg|Mercure|tra
+81|Tl|Thallium|pot
+82|Pb|Plomb|pot
+83|Bi|Bismuth|pot
+84|Po|Polonium|pot
+85|At|Astate|hal
+86|Rn|Radon|nob
+87|Fr|Francium|alk
+88|Ra|Radium|ale
+89|Ac|Actinium|act
+90|Th|Thorium|act
+91|Pa|Protactinium|act
+92|U|Uranium|act
+93|Np|Neptunium|act
+94|Pu|Plutonium|act
+95|Am|Américium|act
+96|Cm|Curium|act
+97|Bk|Berkélium|act
+98|Cf|Californium|act
+99|Es|Einsteinium|act
+100|Fm|Fermium|act
+101|Md|Mendélévium|act
+102|No|Nobélium|act
+103|Lr|Lawrencium|act
+104|Rf|Rutherfordium|tra
+105|Db|Dubnium|tra
+106|Sg|Seaborgium|tra
+107|Bh|Bohrium|tra
+108|Hs|Hassium|tra
+109|Mt|Meitnérium|unk
+110|Ds|Darmstadtium|unk
+111|Rg|Roentgenium|unk
+112|Cn|Copernicium|unk
+113|Nh|Nihonium|unk
+114|Fl|Flérovium|unk
+115|Mc|Moscovium|unk
+116|Lv|Livermorium|unk
+117|Ts|Tennesse|unk|Tennessine
+118|Og|Oganesson|unk`;
+const CATS={alk:"Métaux alcalins",ale:"Métaux alcalino-terreux",tra:"Métaux de transition",pot:"Métaux pauvres",mtd:"Métalloïdes",
+  non:"Non-métaux",hal:"Halogènes",nob:"Gaz nobles",lan:"Lanthanides",act:"Actinides",unk:"Propriétés inconnues"};
+const EL={},ZS=[];
+RAW.trim().split("\n").forEach(l=>{const [z,s,n,c,al]=l.split("|");EL[z]={z:+z,s,n,c,al:al?al.split(","):[]};ZS.push(z)});
+
+// Position dans la grille : période (ligne) et groupe (colonne) ; lanthanides et actinides sur deux lignes à part
+function pos(z){z=+z;
+  if(z>=58&&z<=71)return[9,z-58+4];  if(z>=90&&z<=103)return[10,z-90+4];
+  const P=[[1,2],[3,10],[11,18],[19,36],[37,54],[55,86],[87,118]];
+  const p=P.findIndex(([a,b])=>z>=a&&z<=b),start=P[p][0],i=z-start,len=P[p][1]-start+1;
+  if(p===0)return[1,z===1?1:18];
+  if(len===8)return[p+1,i<2?i+1:i+11];
+  if(len===18)return[p+1,i+1];
+  // périodes 6 et 7 (32 éléments) : 2 premiers, puis La/Ac en groupe 3, puis à partir du groupe 4 après le bloc f
+  if(i<2)return[p+1,i+1]; if(i===2)return[p+1,3]; return[p+1,i-14+1];
+}
+
+// Validation tolérante (même règles que le quiz de géographie)
+const norm=s=>" "+s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/œ/g,"oe").replace(/æ/g,"ae").replace(/[^a-z0-9]+/g," ")+" ";
+const canon=s=>norm(s).replace(/^ (le|la|les|l) /,"").replace(/ /g,"");
+const lev=(a,b)=>{const m=a.length,n=b.length;let p=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]};
+const ALLN=ZS.flatMap(z=>[EL[z].n,...EL[z].al].map(a=>[z,canon(a)]));
+function nameOk(z,v){const x=canon(v);if(!x)return false;const mine=[EL[z].n,...EL[z].al].map(canon);if(mine.includes(x))return true;
+  if(ALLN.some(([c,a])=>c!==z&&a===x))return false;
+  return mine.some(a=>{const tol=a.length>=12?2:a.length>=6?1:0;return tol&&lev(a,x)<=tol&&!ALLN.some(([c,o])=>c!==z&&lev(o,x)<=lev(a,x))})}
+const symOk=(z,v)=>v.trim().toLowerCase()===EL[z].s.toLowerCase();
+
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||"null");return v??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const KEY="tableau-periodique-v1";
+const st=store.get(KEY,{});let found=new Set(st.f||[]),hints=st.h||{};
+const save=()=>store.set(KEY,{f:[...found],h:hints});
+
+// ---- construction du tableau
+const table=document.getElementById("ptable"),CELLS={};
+const spacer=document.createElement("div");spacer.className="gapf";spacer.style.gridRow="8";table.appendChild(spacer);
+for(const z of ZS){const e=EL[z],[r,c]=pos(z);
+  const b=document.createElement("button");b.type="button";b.className="cell";b.dataset.z=z;b.style.gridRow=r;b.style.gridColumn=c;
+  b.style.setProperty("--c",`var(--${e.c})`);b.style.setProperty("--cb",`var(--${e.c}-bg)`);
+  b.innerHTML=`<span class="z">${z}</span><span class="s"></span><span class="n"></span>`;
+  b.setAttribute("aria-label",`Élément ${z}`);table.appendChild(b);CELLS[z]=b;}
+function paint(z,anim){const b=CELLS[z],e=EL[z];b.classList.add("found");b.querySelector(".s").textContent=e.s;b.querySelector(".n").textContent=e.n;
+  b.setAttribute("aria-label",`${z} ${e.s} ${e.n}`);if(anim){b.classList.remove("pop");void b.offsetWidth;b.classList.add("pop")}}
+found.forEach(z=>paint(z));
+
+// ---- légende et score
+const legend=document.getElementById("legend");
+function updateStats(){const n=found.size;document.getElementById("cnt").textContent=n;document.getElementById("bar").style.width=(n/118*100)+"%";
+  document.getElementById("pct").textContent=Math.round(n/118*100)+" %";
+  const h=Object.values(hints).reduce((a,b)=>a+b,0);document.getElementById("hintCount").textContent=h?`${h} lettre${h>1?"s":""} révélée${h>1?"s":""}`:"Aucune lettre révélée";
+  legend.innerHTML="";
+  for(const [k,label] of Object.entries(CATS)){const zs=ZS.filter(z=>EL[z].c===k),f=zs.filter(z=>found.has(z)).length;
+    const li=document.createElement("li");li.className=f===zs.length?"done":"";li.dataset.k=k;li.style.setProperty("--c",`var(--${k})`);li.style.setProperty("--cb",`var(--${k}-bg)`);
+    li.innerHTML=`<i class="sw"></i><span></span><span class="k">${f}/${zs.length}</span>`;li.children[1].textContent=label;legend.appendChild(li)}}
+updateStats();
+legend.addEventListener("mouseover",e=>{const li=e.target.closest("li");if(!li)return;ZS.forEach(z=>CELLS[z].classList.toggle("dim",EL[z].c!==li.dataset.k))});
+legend.addEventListener("mouseleave",()=>ZS.forEach(z=>CELLS[z].classList.remove("dim")));
+
+// ---- carte agrandie (animation FLIP depuis la case)
+const card=document.getElementById("zcard"),backdrop=document.getElementById("backdrop"),sym=document.getElementById("sym"),nm=document.getElementById("nm"),
+  msg=document.getElementById("msg"),hintBtn=document.getElementById("hint"),ask=document.getElementById("ask"),done=document.getElementById("done");
+hintBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>';
+const reduce=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+let cur=null;
+function fill(z){cur=z;const e=EL[z];
+  card.style.setProperty("--c",`var(--${e.c})`);card.style.setProperty("--cb",`var(--${e.c}-bg)`);
+  document.getElementById("zz").textContent=z;document.getElementById("zcat").textContent=CATS[e.c];
+  sym.value="";nm.value=(hints[z]?prefix(z,hints[z]):"");sym.className=nm.className="";msg.textContent="";msg.className="msg";
+  hintBtn.classList.toggle("used",!!hints[z]);
+  if(found.has(z))showDone(z,false);else{ask.hidden=false;done.hidden=true}}
+function showDone(z,fresh){const e=EL[z];ask.hidden=true;done.hidden=false;
+  document.getElementById("dsym").textContent=e.s;document.getElementById("dname").textContent=e.n;
+  document.getElementById("dmsg").textContent=fresh?(found.size===118?"Les 118 éléments sont trouvés. Chapeau !":"Bravo !"):"Déjà trouvé ✓";
+  const nx=nextOpen(z);document.getElementById("next").hidden=!nx;
+  (nx?document.getElementById("next"):document.getElementById("dclose")).focus({preventScroll:true})}
+function flipFrom(el){if(reduce())return;
+  const a=el.getBoundingClientRect(),b=card.getBoundingClientRect();
+  card.animate([{transform:`translate(${a.left-b.left}px,${a.top-b.top}px) scale(${a.width/b.width},${a.height/b.height})`,borderRadius:"40px",opacity:.9},
+    {transform:"none",borderRadius:"18px",opacity:1}],{duration:340,easing:"cubic-bezier(.2,.8,.2,1)"});
+  for(const c of card.querySelectorAll(".zin:not([hidden]),.top"))c.animate([{opacity:0},{opacity:0,offset:.45},{opacity:1}],{duration:340});
+  backdrop.animate([{opacity:0},{opacity:1}],{duration:250})}
+function open(z){
+  if(cur&&CELLS[cur])CELLS[cur].classList.remove("open");
+  fill(z);backdrop.hidden=false;card.hidden=false;CELLS[z].classList.add("open");flipFrom(CELLS[z]);
+  if(!found.has(z))setTimeout(()=>sym.focus({preventScroll:true}),reduce()?0:200)}
+function close(){if(!cur)return;const z=cur,el=CELLS[z];
+  const finish=()=>{card.hidden=true;backdrop.hidden=true;el.classList.remove("open");el.focus({preventScroll:true})};
+  cur=null;if(reduce()){finish();return}
+  const a=el.getBoundingClientRect(),b=card.getBoundingClientRect();
+  const an=card.animate([{transform:"none",opacity:1},{transform:`translate(${a.left-b.left}px,${a.top-b.top}px) scale(${a.width/b.width},${a.height/b.height})`,opacity:.4}],{duration:240,easing:"cubic-bezier(.4,0,.6,1)"});
+  backdrop.animate([{opacity:1},{opacity:0}],{duration:240});an.onfinish=finish}
+function nextOpen(z){const i=ZS.indexOf(String(z));for(let k=1;k<=118;k++){const n=ZS[(i+k)%118];if(!found.has(n))return n}return null}
+
+table.addEventListener("click",e=>{const b=e.target.closest(".cell");if(b)open(b.dataset.z)});
+backdrop.addEventListener("click",close);
+document.getElementById("zclose").onclick=close;document.getElementById("later").onclick=close;document.getElementById("dclose").onclick=close;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&cur)close()});
+document.getElementById("next").onclick=()=>{const n=nextOpen(cur);if(!n)return;CELLS[cur].classList.remove("open");
+  fill(n);CELLS[n].classList.add("open");CELLS[n].scrollIntoView({block:"nearest",inline:"nearest"});
+  if(!reduce())card.animate([{transform:"scale(.94)",opacity:.4},{transform:"none",opacity:1}],{duration:220,easing:"cubic-bezier(.2,.8,.2,1)"});
+  sym.focus({preventScroll:true})};
+
+// indice : le nom, lettre par lettre
+const prefix=(z,n)=>{const a=EL[z].n;let k=0,i=0;while(i<a.length&&k<n){if(/[A-Za-zÀ-ÿ]/.test(a[i]))k++;i++}return a.slice(0,i)};
+hintBtn.onclick=()=>{const z=cur;if(!z||found.has(z))return;const max=EL[z].n.replace(/[^A-Za-zÀ-ÿ]/g,"").length;
+  hints[z]=Math.min((hints[z]||0)+1,max);save();updateStats();hintBtn.classList.add("used");nm.value=prefix(z,hints[z]);nm.classList.remove("bad");nm.focus();
+  nm.setSelectionRange(nm.value.length,nm.value.length)};
+
+card.addEventListener("submit",e=>{e.preventDefault();const z=cur;if(!z)return;
+  if(found.has(z)){document.getElementById("next").click();return}
+  const sOk=symOk(z,sym.value),nOk=nameOk(z,nm.value);
+  sym.className=sym.value.trim()&&sOk?"good":"bad";nm.className=nm.value.trim()&&nOk?"good":"bad";
+  if(sOk&&nOk){found.add(z);save();paint(z,true);updateStats();showDone(z,true);return}
+  msg.className="msg bad";
+  msg.textContent=!sym.value.trim()||!nm.value.trim()?"Il faut le symbole et le nom.":(!sOk&&!nOk)?"Symbole et nom incorrects.":!sOk?"Le nom est bon, mais pas le symbole.":"Le symbole est bon, mais pas le nom.";
+  card.classList.remove("shake");void card.offsetWidth;card.classList.add("shake")});
+done.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.tagName!=="BUTTON"){e.preventDefault();document.getElementById("next").click()}});
+
+// outils
+document.getElementById("randomBtn").onclick=()=>{const left=ZS.filter(z=>!found.has(z));if(!left.length)return;const z=left[Math.floor(Math.random()*left.length)];
+  CELLS[z].scrollIntoView({block:"nearest",inline:"center"});setTimeout(()=>open(z),60)};
+const conf=document.getElementById("confirm");
+document.getElementById("resetBtn").onclick=()=>conf.hidden=false;
+document.getElementById("cNo").onclick=()=>conf.hidden=true;
+document.getElementById("cYes").onclick=()=>{found.clear();hints={};save();ZS.forEach(z=>{const b=CELLS[z];b.classList.remove("found");b.querySelector(".s").textContent="";b.querySelector(".n").textContent="";b.setAttribute("aria-label",`Élément ${z}`)});conf.hidden=true;updateStats()};
+</script>
+
+</body>
+</html>
